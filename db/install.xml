@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<XMLDB PATH="blocks/projectgradeup/db" VERSION="20150827" COMMENT="XMLDB file for Moodle blocks/projectgradeup"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:noNamespaceSchemaLocation="../../../lib/xmldb/xmldb.xsd"
+>
+  <TABLES>
+    <TABLE NAME="block_projectgradeup" COMMENT="Default comment for block_projectgradeup, please edit me">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="block_id" TYPE="int" LENGTH="20" NOTNULL="true" SEQUENCE="false" COMMENT="The block id of this instance"/>
+        <FIELD NAME="course_id" TYPE="int" LENGTH="20" NOTNULL="true" SEQUENCE="false" COMMENT="The course id that this block is in"/>
+        <FIELD NAME="course_difficulty" TYPE="int" LENGTH="20" NOTNULL="true" SEQUENCE="false" COMMENT="The difficulty of a course, can be an integer from 1-5"/>
+        <FIELD NAME="allow_dual_graphs" TYPE="int" LENGTH="1" NOTNULL="true" SEQUENCE="false" COMMENT="Allow dual graphing on the course, overridden by the admin property of the same name"/>
+        <FIELD NAME="course_end_date" TYPE="int" LENGTH="20" NOTNULL="false" SEQUENCE="false" COMMENT="The end date of the course, optional"/>
+        <FIELD NAME="override_duration" TYPE="int" LENGTH="1" NOTNULL="true" SEQUENCE="false" COMMENT="A value stating if the teacher has overridden the dates set in the artifact duration"/>
+        <FIELD NAME="default_duration" TYPE="int" LENGTH="20" NOTNULL="true" SEQUENCE="false" COMMENT="The default duration. Used only if the override is set. This value must be less than the duration of the class."/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="pgu_artifact_types" COMMENT="The table holding information pertaining to artifacts for the heatmap chart">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="type" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="The type of artifact, a title"/>
+        <FIELD NAME="suffix" TYPE="char" LENGTH="20" NOTNULL="true" SEQUENCE="false" COMMENT="The [definition_] portion of the title. This allows our algorithm to know which artifacts are which."/>
+        <FIELD NAME="duration" TYPE="int" LENGTH="5" NOTNULL="true" SEQUENCE="false" COMMENT="The duration of the 'intensity period' in days. The maximum value is 99999 days or ~273 years."/>
+        <FIELD NAME="course_id" TYPE="int" LENGTH="20" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="The course in which the type is defined."/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="pgu_artifacts" COMMENT="The containing table of the applications data. This table acts as a cache for the artifact object, as to prevent server delay by complex queries. This table will be updated regularly by moodle cron.">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="grade" TYPE="number" LENGTH="10" NOTNULL="false" SEQUENCE="false" DECIMALS="5" COMMENT="The grade of a selected artifact, may be null if artifact has not been graded."/>
+        <FIELD NAME="weight" TYPE="number" LENGTH="10" NOTNULL="true" SEQUENCE="false" DECIMALS="5" COMMENT="The weight of the current artifact. Cannot be null."/>
+        <FIELD NAME="category" TYPE="number" LENGTH="10" NOTNULL="true" SEQUENCE="false" DECIMALS="5" COMMENT="The weight of the item's category, cannot be null"/>
+        <FIELD NAME="status" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="A field depicting the graded/completion status of the artifact, cannot be null"/>
+        <FIELD NAME="title" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="The title of the artifact, cannot be null"/>
+        <FIELD NAME="type" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="An optional field depicting the type of artifact"/>
+        <FIELD NAME="title_long" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="a concatenation of both title, class id, and the artifact id, in-case of many like-named artifacts."/>
+        <FIELD NAME="class_id" TYPE="int" LENGTH="5" NOTNULL="true" SEQUENCE="false" COMMENT="The class id in which the artifact is"/>
+        <FIELD NAME="user_id" TYPE="int" LENGTH="5" NOTNULL="false" SEQUENCE="false" COMMENT="The user id associated with the artifact"/>
+        <FIELD NAME="artifact_id" TYPE="int" LENGTH="20" NOTNULL="true" SEQUENCE="false" COMMENT="The artifact this artifact associates with"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="pgu_class_date_time" COMMENT="Default comment for the table, please edit me">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="class_long_name" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="The name of the course"/>
+        <FIELD NAME="class_start_date" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The start date of the class"/>
+        <FIELD NAME="class_number" TYPE="char" LENGTH="20" NOTNULL="false" SEQUENCE="false" COMMENT="The class number"/>
+        <FIELD NAME="class_short_name" TYPE="text" NOTNULL="false" SEQUENCE="false" COMMENT="The optional field for the short name of the class"/>
+        <FIELD NAME="class_end_date" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="The end date for the class"/>
+        <FIELD NAME="class_difficulty" TYPE="int" LENGTH="2" NOTNULL="false" DEFAULT="1" SEQUENCE="false" COMMENT="An optional field where a teacher could enter the difficulty of the course. This scale is numeric, ranging from 1-5 in terms of difficulty."/>
+        <FIELD NAME="class_id" TYPE="int" LENGTH="5" NOTNULL="true" SEQUENCE="false" COMMENT="The class that this entry represents"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="pgu_artifact_date_time" COMMENT="The containing table of the applications data. This table acts as a cache for the date_time object, as to prevent server delay by complex queries. This table will be updated regularly by moodle cron.">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="artifact_name" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="The artifact name"/>
+        <FIELD NAME="artifact_start_date" TYPE="int" LENGTH="10" NOTNULL="false" SEQUENCE="false" COMMENT="The optional start_date of an artifact. Entries to the pgu_artifact_type table will be overridden."/>
+        <FIELD NAME="artifact_end_date" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="false" COMMENT="The ending date of an artifact, also known as when it is due"/>
+        <FIELD NAME="artifact_id" TYPE="int" LENGTH="20" NOTNULL="true" SEQUENCE="false" COMMENT="The entry in the artifact table that this artifact date time references"/>
+        <FIELD NAME="class_id" TYPE="int" LENGTH="5" NOTNULL="true" SEQUENCE="false" COMMENT="The class in which the artifact resides"/>
+        <FIELD NAME="artifact_title_long" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="A combination of the artifact name, id, and class id with which associate itself with its artifact counterpart"/>
+        <FIELD NAME="artifact_weight" TYPE="number" LENGTH="10" NOTNULL="true" SEQUENCE="false" DECIMALS="5" COMMENT="The weight of the aritfact"/>
+        <FIELD NAME="artifact_category" TYPE="number" LENGTH="10" NOTNULL="true" SEQUENCE="false" DECIMALS="5" COMMENT="The category weight of the artifact"/>
+        <FIELD NAME="artifact_difficulty" TYPE="number" LENGTH="10" NOTNULL="false" SEQUENCE="false" DECIMALS="5" COMMENT="The calculated difficulty of the artifact, between 1 and 5"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="pgu_artifact_difficulty" COMMENT="The table holding information pertaining to the artifacts for the heatmap chart">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="type" TYPE="text" NOTNULL="true" SEQUENCE="false" COMMENT="The type name"/>
+        <FIELD NAME="suffix" TYPE="char" LENGTH="20" NOTNULL="true" SEQUENCE="false" COMMENT="The suffix of the item difficulty"/>
+        <FIELD NAME="difficulty" TYPE="int" LENGTH="1" NOTNULL="true" SEQUENCE="false" COMMENT="The difficulty of the current artifact (1-3)"/>
+        <FIELD NAME="course_id" TYPE="int" LENGTH="20" NOTNULL="true" DEFAULT="0" SEQUENCE="false" COMMENT="The course in which the difficulty is defined."/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+    </TABLE>
+    <TABLE NAME="pgu_stored_blocks" COMMENT="Keeps track of the instances of the block, allowing them to be created and data generated as needed">
+      <FIELDS>
+        <FIELD NAME="id" TYPE="int" LENGTH="10" NOTNULL="true" SEQUENCE="true"/>
+        <FIELD NAME="block_id" TYPE="int" LENGTH="20" NOTNULL="true" SEQUENCE="false" COMMENT="The block id of this instance"/>
+        <FIELD NAME="course_id" TYPE="int" LENGTH="20" NOTNULL="true" SEQUENCE="false" COMMENT="The course id that this block is in"/>
+        <FIELD NAME="grading_method" TYPE="int" LENGTH="1" NOTNULL="true" SEQUENCE="false" COMMENT="The method used for grading, can be 1-9 (see documentation)"/>
+      </FIELDS>
+      <KEYS>
+        <KEY NAME="primary" TYPE="primary" FIELDS="id"/>
+      </KEYS>
+    </TABLE>
+  </TABLES>
+</XMLDB>
